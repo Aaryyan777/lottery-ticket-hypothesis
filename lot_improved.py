@@ -68,7 +68,7 @@ def get_global_mask(model, pruning_rate=0.2, current_mask=None):
             all_scores.append(np.abs(tensor.flatten()))
     
     all_scores = np.concatenate(all_scores)
-    # Calculate threshold on the surviving weights
+    # Calculating threshold on the surviving weights
     threshold = np.percentile(all_scores, pruning_rate * 100)
     
     new_mask = {}
@@ -79,11 +79,11 @@ def get_global_mask(model, pruning_rate=0.2, current_mask=None):
             # Keep weights greater than or equal to threshold
             mask_val = np.where(np.abs(tensor) < threshold, 0, 1)
             
-            # Ensure we respect the previous mask (once pruned, always pruned)
+            # (once pruned, always pruned)
             if current_mask:
                  mask_val = mask_val * current_mask[name].cpu().numpy()
                  
-            # CAST TO FLOAT32 TO AVOID DOUBLE/FLOAT MISMATCH
+            
             new_mask[name] = torch.from_numpy(mask_val).float().to(param.device)
             
     return new_mask
@@ -193,7 +193,7 @@ def run_experiment(epochs=20, rounds=20, prune_rate=0.2, batch_size=60):
 
         # --- 2. Train Winning Ticket (Reset to W0) ---
         model.load_state_dict(initial_state_dict) # Reset to W0
-        apply_mask(model, mask) # Apply current mask
+        apply_mask(model, mask) 
         
         # Using SGD with momentum as per LTH paper standard
         optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
@@ -224,7 +224,7 @@ def run_experiment(epochs=20, rounds=20, prune_rate=0.2, batch_size=60):
         print(f"{round_idx:<5} | {sparsity:<12.2f} | {wt_acc:<15.2f} | {rand_acc:<15.2f}")
 
         # --- 4. Prune (Calculate Mask for NEXT round) ---
-        # Calculate next mask based on the TRAINED weights of the winning ticket
+        # Calculates next mask based on the TRAINED weights of the winning ticket
         model.load_state_dict(trained_weights)
         if round_idx < rounds:
             mask = get_global_mask(model, pruning_rate=prune_rate, current_mask=mask)
@@ -250,7 +250,7 @@ def plot_results(results):
     plt.ylabel("Test Accuracy (%)", fontsize=14)
     plt.legend(fontsize=12)
     plt.xscale('log')
-    plt.gca().invert_xaxis() # 100% -> 0.1%
+    plt.gca().invert_xaxis() 
     
     ticks = [100, 50, 20, 10, 5, 2, 1]
     plt.xticks(ticks, ticks)
@@ -258,7 +258,7 @@ def plot_results(results):
     
     plt.grid(True, which="both", ls="-", alpha=0.5)
     plt.tight_layout()
-    plt.savefig('graph_improved.png') # Save plot automatically
+    plt.savefig('graph_improved.png') 
     print("Graph saved to graph_improved.png")
     plt.show()
 
