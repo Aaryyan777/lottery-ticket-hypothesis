@@ -38,8 +38,8 @@ def get_mnist_loaders(batch_size=60, test_batch_size=1000):
         transforms.Normalize((0.1307,), (0.3081,)) # Mean and Std dev of MNIST
     ])
     
-    # Check if we are in Kaggle (datasets often at /kaggle/input or just download to ./data)
-    # This will download to ./data
+    
+    
     train_loader = torch.utils.data.DataLoader(
         datasets.MNIST('./data', train=True, download=True, transform=transform),
         batch_size=batch_size, shuffle=True
@@ -177,7 +177,7 @@ def run_experiment(epochs=5, rounds=10, prune_rate=0.2, batch_size=64):
 
         # --- 2. Train Winning Ticket (Reset to W0) ---
         model.load_state_dict(initial_state_dict) # Reset to W0
-        apply_mask(model, mask) # Apply current mask
+        apply_mask(model, mask) 
         
         optimizer = optim.Adam(model.parameters(), lr=1.2e-3)
         criterion = nn.CrossEntropyLoss()
@@ -211,7 +211,7 @@ def run_experiment(epochs=5, rounds=10, prune_rate=0.2, batch_size=64):
         model.load_state_dict(trained_weights)
         new_mask_updates = get_mask_step(model, pruning_rate=prune_rate)
         
-        # Combine with previous mask (AND operation)
+        # Combine with previous mask
         for name in mask:
             if name in new_mask_updates:
                 mask[name] = mask[name] * new_mask_updates[name]
@@ -246,8 +246,9 @@ def plot_results(results):
     plt.tight_layout()
     plt.show()
 
-# Run the whole thing
-# Reduce epochs/rounds if you want it to run faster for a quick test
+
+# Reduce epochs/rounds for quick testing (i used this)
 if __name__ == "__main__":
     results = run_experiment(epochs=5, rounds=10, prune_rate=0.2)
     plot_results(results)
+
